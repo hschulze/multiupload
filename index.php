@@ -26,20 +26,45 @@
 				status.text('');
 				//Add uploaded file to list
 				if(response == "success"){
-					$('<li></li>').appendTo('#files').html('<img src="./uploads/'+file+'" alt="" /><br />'+file).addClass('success');
+					$('<li></li>').appendTo('#galerie').html('<a href="crop.php./uploads/'+file+'"><img src="./uploads/'+file+'" width="140" alt="Vorschau" /></a>');
 				} else{
-					$('<li></li>').appendTo('#files').text(file).addClass('error');
+					$('<li></li>').appendTo('#galerie').text(file);
 				}
 			}
 		});
-		
 	});
 </script>
 
 </head>
 <body>
+	<div id="top">Dateien hochladen</div>
 	<div id="upload" ><span>Upload File</span></div><span id="status"></span>
 		
 	<ul id="files" ></ul>
+	
+	
+	<div id="galerie_div">
+		Vorhandene Uploads (Zum Bearbeiten Anklicken):
+		<ul id="galerie">
+			<?php 
+				$dir = "uploads";
+				$dirHandle = opendir($dir);
+				
+				while ($datei = readdir($dirHandle)) {
+					if(!is_dir($datei)) {
+						$bildinfo = pathinfo($dir."/".$datei);
+						?>
+						<li>
+							<a href="<?php echo $bildinfo['dirname']."/".$bildinfo['basename'];?>">
+								<img src="<?php echo $bildinfo['dirname']."/".$bildinfo['basename'];?>" width="140" alt="Vorschau" />
+							</a>
+						</li>
+					<?php 
+					}
+				}
+				closedir($dirHandle);
+			?>
+		</ul>
+	</div>
 </body>
 </html>
