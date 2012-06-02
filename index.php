@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Insert title here</title>
+<title>Multidateiupload</title>
 <script src="js/jquery-latest.js" type="text/javascript"></script>
 <script src="js/ajaxupload.3.5.js" type="text/javascript"></script>
 
@@ -25,8 +25,9 @@
 				//On completion clear the status
 				status.text('');
 				//Add uploaded file to list
-				if(response == "success"){
-					$('<li></li>').appendTo('#galerie').html('<a href="crop.php./uploads/'+file+'"><img src="./uploads/'+file+'" width="140" alt="Vorschau" /></a>');
+				//alert(response);
+				if(response >= 0){
+					$('<li></li>').appendTo('#galerie').html('<a href="crop.php?id='+response+'"><img src="./pic/no_pic.jpg" width="140" alt="Vorschau" /></a>');
 				} else{
 					$('<li></li>').appendTo('#galerie').text(file);
 				}
@@ -39,30 +40,39 @@
 <body>
 	<div id="top">Dateien hochladen</div>
 	<div id="upload" ><span>Upload File</span></div><span id="status"></span>
-		
-	<ul id="files" ></ul>
-	
-	
+	<br />
 	<div id="galerie_div">
 		Vorhandene Uploads (Zum Bearbeiten Anklicken):
 		<ul id="galerie">
 			<?php 
-				$dir = "uploads";
-				$dirHandle = opendir($dir);
+				$verbindung = mysql_connect("localhost", "galerieuser", "galerieuser") or die("Keine Verbindung zur DB möglich.");
+				mysql_select_db("galerie") or die("Die DB existiert nicht");
 				
-				while ($datei = readdir($dirHandle)) {
-					if(!is_dir($datei)) {
-						$bildinfo = pathinfo($dir."/".$datei);
-						?>
-						<li>
-							<a href="<?php echo $bildinfo['dirname']."/".$bildinfo['basename'];?>">
-								<img src="<?php echo $bildinfo['dirname']."/".$bildinfo['basename'];?>" width="140" alt="Vorschau" />
-							</a>
-						</li>
+				$abfrage = "SELECT id, originalname, vorschauname, filetype, timestamp FROM bilder ORDER BY timestamp DESC LIMIT 5";
+				$result = mysql_query($abfrage);
+				
+				while ($row = mysql_fetch_object($result)) {
+					//echo "$row->id, $row->originalname, $row->vorschauname, $row->filetype, $row->timestamp <br />";
+					?>
+					<li>
+						<a href="crop.php?id=<?php echo "$row->id"?>">
+							<?php
+								if($row->vorschauname != null) { 
+							?>
+									<img src="uploads/<?php echo "$row->vorschauname.$row->filetype";?>" width="140" height="140" alt="Vorschau" />
+							<?php 
+								} else {
+							?>
+									<img src="pic/no_pic.jpg" width="140" height="140" alt="Keine Vorschau" />
+							<?php 
+								}
+							?>
+							<!-- <img src="<?php echo $bildinfo['dirname']."/".$bildinfo['basename'];?>" width="140" alt="Vorschau" />  -->
+						</a>
+					</li>
 					<?php 
-					}
 				}
-				closedir($dirHandle);
+				mysql_close($verbindung);
 			?>
 		</ul>
 	</div>
