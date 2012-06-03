@@ -4,8 +4,8 @@
 	$uploaddir = './uploads/';
 	
 	$file = basename($_FILES['uploadfile']['name']);
-	$filename = pathinfo($file, PATHINFO_FILENAME);
-	$filetype = pathinfo($file, PATHINFO_EXTENSION);
+	$filename = strtolower(pathinfo($file, PATHINFO_FILENAME));
+	$filetype = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 	$timestamp = date("Y-m-d H:i:s");
 	
 	// DB-Eintrag

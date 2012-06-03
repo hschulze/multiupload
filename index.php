@@ -27,7 +27,8 @@
 				//Add uploaded file to list
 				//alert(response);
 				if(response >= 0){
-					$('<li></li>').appendTo('#galerie').html('<a href="crop.php?id='+response+'"><img src="./pic/no_pic.jpg" width="140" alt="Vorschau" /></a>');
+					$('<li></li>').prependTo('#galerie').html('<a href="crop.php?id='+response+'"><img src="./uploads/tn_'+response+'.jpg" width="140" height="140" alt="Vorschau" /></a>');
+					//$('<li></li>').appendTo('#galerie').html('<a href="crop.php?id='+response+'"><img src="./pic/no_pic.jpg" width="140" alt="Vorschau" /></a>');
 				} else{
 					$('<li></li>').appendTo('#galerie').text(file);
 				}
@@ -42,13 +43,13 @@
 	<div id="upload" ><span>Upload File</span></div><span id="status"></span>
 	<br />
 	<div id="galerie_div">
-		Vorhandene Uploads (Zum Bearbeiten Anklicken):
+		Vorhandene Uploads (Zum Bearbeiten der Vorschau Anklicken):
 		<ul id="galerie">
 			<?php 
 				$verbindung = mysql_connect("localhost", "galerieuser", "galerieuser") or die("Keine Verbindung zur DB möglich.");
 				mysql_select_db("galerie") or die("Die DB existiert nicht");
 				
-				$abfrage = "SELECT id, originalname, vorschauname, filetype, timestamp FROM bilder ORDER BY timestamp DESC LIMIT 5";
+				$abfrage = "SELECT id, originalname, vorschauname, filetype, timestamp FROM bilder ORDER BY timestamp DESC LIMIT 50";
 				$result = mysql_query($abfrage);
 				
 				while ($row = mysql_fetch_object($result)) {
@@ -59,7 +60,7 @@
 							<?php
 								if($row->vorschauname != null) { 
 							?>
-									<img src="uploads/<?php echo "$row->vorschauname.$row->filetype";?>" width="140" height="140" alt="Vorschau" />
+									<img src="uploads/<?php echo "$row->vorschauname.jpg";?>" width="140" height="140" alt="Vorschau" />
 							<?php 
 								} else {
 							?>
