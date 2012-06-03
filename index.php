@@ -1,3 +1,12 @@
+<?php 
+	//no  cache headers 
+	header("Expires: Mon, 26 Jul 1990 05:00:00 GMT");
+	header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+	header("Cache-Control: no-store, no-cache, must-revalidate");
+	header("Cache-Control: post-check=0, pre-check=0", false);
+	header("Pragma: no-cache");
+?>
+
 <html>
 <head>
 <title>Multidateiupload</title>
@@ -30,7 +39,7 @@
 					$('<li></li>').prependTo('#galerie').html('<a href="crop.php?id='+response+'"><img src="./uploads/tn_'+response+'.jpg" width="140" height="140" alt="Vorschau" /></a>');
 					//$('<li></li>').appendTo('#galerie').html('<a href="crop.php?id='+response+'"><img src="./pic/no_pic.jpg" width="140" alt="Vorschau" /></a>');
 				} else{
-					$('<li></li>').appendTo('#galerie').text(file);
+					$('<li></li>').prependTo('#galerie').text(file);
 				}
 			}
 		});
@@ -46,21 +55,21 @@
 		Vorhandene Uploads (Zum Bearbeiten der Vorschau Anklicken):
 		<ul id="galerie">
 			<?php 
-				$verbindung = mysql_connect("localhost", "galerieuser", "galerieuser") or die("Keine Verbindung zur DB möglich.");
-				mysql_select_db("galerie") or die("Die DB existiert nicht");
+				$db = new mysqli("localhost", "galerieuser", "galerieuser", "galerie");
+				$stmt = $db->stmt_init();
+				$stmt->prepare("SELECT id, originalname, vorschauname, filetype, timestamp FROM bilder ORDER BY timestamp DESC LIMIT 50");
+				$stmt->execute();
+				$stmt->bind_result($id, $originalname, $vorschauname, $filetype, $timestamp);
 				
-				$abfrage = "SELECT id, originalname, vorschauname, filetype, timestamp FROM bilder ORDER BY timestamp DESC LIMIT 50";
-				$result = mysql_query($abfrage);
-				
-				while ($row = mysql_fetch_object($result)) {
+				while ($stmt->fetch()) {
 					//echo "$row->id, $row->originalname, $row->vorschauname, $row->filetype, $row->timestamp <br />";
 					?>
 					<li>
-						<a href="crop.php?id=<?php echo "$row->id"?>">
+						<a href="crop.php?id=<?php echo "$id"?>">
 							<?php
-								if($row->vorschauname != null) { 
+								if($vorschauname != null) { 
 							?>
-									<img src="uploads/<?php echo "$row->vorschauname.jpg";?>" width="140" height="140" alt="Vorschau" />
+									<img src="uploads/<?php echo "$vorschauname.jpg";?>" width="140" height="140" alt="Vorschau" />
 							<?php 
 								} else {
 							?>
@@ -73,7 +82,8 @@
 					</li>
 					<?php 
 				}
-				mysql_close($verbindung);
+				$stmt->close();
+				$db->close();
 			?>
 		</ul>
 	</div>

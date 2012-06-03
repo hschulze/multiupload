@@ -3,6 +3,11 @@
 
 	$uploaddir = './uploads/';
 	
+	if(!is_dir($uploaddir)){
+		mkdir($uploaddir, 0777);
+		chmod($uploaddir, 0777);
+	}
+	
 	$file = basename($_FILES['uploadfile']['name']);
 	$filename = strtolower(pathinfo($file, PATHINFO_FILENAME));
 	$filetype = strtolower(pathinfo($file, PATHINFO_EXTENSION));
@@ -15,13 +20,13 @@
 	$stmt_insert->prepare("INSERT INTO bilder (originalname, filetype, timestamp) VALUES (?, ?, ?)");
 	$stmt_insert->bind_param('sss', $filename, $filetype, $timestamp);
 	
-	$stmt_insert->execute();
+	$insert_result = $stmt_insert->execute();
 	$stmt_insert->close();
 	
 	$stmt_id = $db->stmt_init();
 	$stmt_id->prepare("SELECT id FROM bilder WHERE originalname = ? AND timestamp = ?");
 	$stmt_id->bind_param('ss', $filename, $timestamp);
-	$insert_result = $stmt_id->execute();
+	$stmt_id->execute();
 	$stmt_id->bind_result($id);
 	
 	$stmt_id->fetch();
