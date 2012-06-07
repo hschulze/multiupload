@@ -36,7 +36,7 @@
 				//Add uploaded file to list
 				//alert(response);
 				if(response >= 0){
-					$('<li></li>').prependTo('#galerie').html('<a href="crop.php?id='+response+'"><img src="./uploads/tn_'+response+'.jpg" width="140" height="140" alt="Vorschau" /></a>');
+					$('<li></li>').prependTo('#galerie').html('<a href="modifythumb.php?id='+response+'"><img src="./uploads/tn_'+response+'.jpg" width="140" height="140" alt="Vorschau" /></a>');
 					//$('<li></li>').appendTo('#galerie').html('<a href="crop.php?id='+response+'"><img src="./pic/no_pic.jpg" width="140" alt="Vorschau" /></a>');
 				} else{
 					$('<li></li>').prependTo('#galerie').text(file);
@@ -55,35 +55,41 @@
 		Vorhandene Uploads (Zum Bearbeiten der Vorschau Anklicken):
 		<ul id="galerie">
 			<?php 
-				$db = new mysqli("localhost", "galerieuser", "galerieuser", "galerie");
-				$stmt = $db->stmt_init();
-				$stmt->prepare("SELECT id, originalname, vorschauname, filetype, timestamp FROM bilder ORDER BY timestamp DESC LIMIT 50");
-				$stmt->execute();
-				$stmt->bind_result($id, $originalname, $vorschauname, $filetype, $timestamp);
-				
-				while ($stmt->fetch()) {
-					//echo "$row->id, $row->originalname, $row->vorschauname, $row->filetype, $row->timestamp <br />";
-					?>
-					<li>
-						<a href="crop.php?id=<?php echo "$id"?>">
-							<?php
-								if($vorschauname != null) { 
-							?>
-									<img src="uploads/<?php echo "$vorschauname.jpg";?>" width="140" height="140" alt="Vorschau" />
-							<?php 
-								} else {
-							?>
-									<img src="pic/no_pic.jpg" width="140" height="140" alt="Keine Vorschau" />
-							<?php 
-								}
-							?>
-							<!-- <img src="<?php echo $bildinfo['dirname']."/".$bildinfo['basename'];?>" width="140" alt="Vorschau" />  -->
-						</a>
-					</li>
-					<?php 
+				$db = @new mysqli('localhost', 'galerieuser', 'galerieuser', 'galerie');
+				if(mysqli_connect_errno() == 0) {
+					$stmt = $db->stmt_init();
+					if(!$stmt->prepare("SELECT id, originalname, vorschauname, filetype, timestamp FROM bilder ORDER BY timestamp DESC LIMIT 50")) {
+						die($db->error);
+					}
+					$stmt->execute();
+					$stmt->bind_result($id, $originalname, $vorschauname, $filetype, $timestamp);
+					
+					while ($stmt->fetch()) {
+						//echo "$row->id, $row->originalname, $row->vorschauname, $row->filetype, $row->timestamp <br />";
+						?>
+						<li>
+							<a href="modifythumb.php?id=<?php echo "$id"?>">
+								<?php
+									if($vorschauname != null) { 
+								?>
+										<img src="uploads/<?php echo "$vorschauname.jpg";?>" width="140" height="140" alt="Vorschau" />
+								<?php 
+									} else {
+								?>
+										<img src="pic/no_pic.jpg" width="140" height="140" alt="Keine Vorschau" />
+								<?php 
+									}
+								?>
+								<!-- <img src="<?php echo $bildinfo['dirname']."/".$bildinfo['basename'];?>" width="140" alt="Vorschau" />  -->
+							</a>
+						</li>
+						<?php 
+					}
+					$stmt->close();
+					$db->close();
+				} else {
+					echo "Es konnte keine Verbindung zur Datenbank hergestellt werden";
 				}
-				$stmt->close();
-				$db->close();
 			?>
 		</ul>
 	</div>

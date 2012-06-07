@@ -6,7 +6,7 @@
 	$db = new mysqli("localhost", "galerieuser", "galerieuser", "galerie");
 	$stmt = $db->stmt_init();
 	$stmt->prepare("SELECT originalname, vorschauname, filetype, timestamp FROM bilder WHERE id = ?");
-	$stmt->bind_param('s', $id);
+	$stmt->bind_param('i', $id);
 	$stmt->execute();
 	$stmt->bind_result($originalname, $vorschauname, $filetype, $timestamp);
 	$stmt->fetch();
@@ -21,9 +21,10 @@
 	
 	$max_width = "500";
 	
-	$current_image_size = getimagesize("./uploads/" . $id . "." . $filetype);
+	$current_image_size = getimagesize("$large_image_location");
 	$current_large_image_width = $current_image_size[0];
 	$current_large_image_height = $current_image_size[1];
+	
 	
 	if (isset($_POST["upload_thumbnail"])) {
 		//Get the new coordinates to crop the image.
@@ -39,19 +40,14 @@
 		//Reload the page again to view the thumbnail
 		$path = pathinfo($_SERVER['REQUEST_URI'], PATHINFO_DIRNAME);
 		header("HTTP/1.1 301 Moved Permanently");
-		header("Location: http://" . $_SERVER['HTTP_HOST'] . $path . "/index.php?");
+		header("Location: http://" . $_SERVER['HTTP_HOST'] . $path . "/index.php");
 		exit();
 	}
-	
-//	if($current_large_image_width > $max_width) {
-//		$scale = $max_width/$current_large_image_width;
-//		$
-//	}
 ?>
 
 <html>
 <head>
-<title>Insert title here</title>
+<title>Vorschau bearbeiten</title>
 
 <link rel="stylesheet" type="text/css" href="css/style.css" />
 
@@ -107,7 +103,7 @@
 		<br />
 		<img src="./uploads/<?php echo "$id.$filetype";?>" style="fload: left; margin-right: 10px;" id="thumbnail" />
 		<div style="border: 1px #e1e1e1 solid; float: left; position: relative; overflow: hidden; width: <?php echo $thumb_width?>px; height: <?php echo $thumb_height?>px;">
-			<img src="./uploads/tn_<?php echo "$id.$filetype";?>" style="position: relative;" />
+			<img src="./uploads/tn_<?php echo "$id.jpg";?>" style="position: relative;" />
 		</div>
 		<br />
 		<form name="thumbnail" action="<?php echo $_SERVER["PHP_SELF"] . "?id=" . $id;?>" method="post">
