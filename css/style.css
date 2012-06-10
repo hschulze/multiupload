@@ -1,7 +1,7 @@
 #top{
 	font-family: Arial, Helvetica, sans-serif;
 	font-weight: bold;
-	font-size: 15px;
+	font-size: 20px;
 	color:#3366cc;
 }
 
@@ -22,7 +22,6 @@ ul#galerie li{
     padding: 3px;
     background-color:#ebebeb;
     border:1px solid #CCC;
-    float:left;
     margin:0 10px 10px 0;
 }
 ul#galerie li:hover{
@@ -36,7 +35,6 @@ ul#galerie li span{
 ul#galerie li a img{
         border:none;
 }
-
 
 .qq-uploader { position:relative; width: 100%;}
 

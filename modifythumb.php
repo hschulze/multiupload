@@ -5,7 +5,7 @@
 	
 	$db = new mysqli("localhost", "galerieuser", "galerieuser", "galerie");
 	$stmt = $db->stmt_init();
-	$stmt->prepare("SELECT originalname, vorschauname, filetype, timestamp FROM bilder WHERE id = ?");
+	$stmt->prepare("SELECT name, thumbname, filetype, timestamp FROM bilder WHERE id = ?");
 	$stmt->bind_param('i', $id);
 	$stmt->execute();
 	$stmt->bind_result($originalname, $vorschauname, $filetype, $timestamp);

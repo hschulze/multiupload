@@ -16,30 +16,31 @@
 				$db = @new mysqli('localhost', 'galerieuser', 'galerieuser', 'galerie');
 				if(mysqli_connect_errno() == 0) {
 					$stmt = $db->stmt_init();
-					if(!$stmt->prepare("SELECT id, name, beschreibung FROM products")) {
+					if(!$stmt->prepare("SELECT id, name FROM products")) {
 						die($db->error);
 					}
 					$stmt->execute();
-					$stmt->store_result();	// ermöglicht es, dass ein zweites Query aufgerufen werden kann
-					$stmt->bind_result($id, $name, $beschreibung);
+					$result = $stmt->get_result();
 					
-					while ($stmt->fetch()) {
-						$stmt_product = $db->stmt_init();
-						if(!$stmt_product->prepare("SELECT thumbname FROM bilder WHERE productid = ? AND ismainthumb = '1'")) {
+					while ($row = $result->fetch_assoc()) {
+						$stmt = $db->stmt_init();
+						if(!$stmt->prepare("SELECT thumbname FROM bilder WHERE productid = ? ORDER BY ismainthumb DESC")) {
 							die($db->error);
 						}
-						$stmt_product->bind_param('s', $id);
-						$stmt_product->execute();
+						$id = $row['id'];
+						$name = $row['name'];
+						$stmt->bind_param('i', $id);
+						$stmt->execute();
+						$result_product = $stmt->get_result();
 						
  						?>
 						<li>
 							<a href="product.php?id=<?php echo "$id"?>">
 								<?php
-									if($stmt_product->num_rows == 1) {
-											$stmt_product->bind_result($thumbname);
-											$stmt_product->fetch();
+									if($result_product->num_rows > 0) {
+											$row_product = $result_product->fetch_assoc();
 								?>
-										<img src="uploads/<?php echo "$thumbname.jpg";?>" width="140" height="140" alt="Vorschau" />
+										<img src="uploads/<?php echo $row_product['thumbname'] . ".jpg";?>" width="140" height="140" alt="Vorschau" />
 								<?php 
 									} else {
 								?>
@@ -51,9 +52,10 @@
 							</a>
 						</li>
 						<?php 
-						$stmt_product->close();
+						$result_product->close();
+						$stmt->close();
 					}
-					$stmt->close();
+					$result->close();
 					$db->close();
 				} else {
 					echo "Es konnte keine Verbindung zur Datenbank hergestellt werden";
